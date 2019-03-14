@@ -1,6 +1,6 @@
 <template>
   <el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-position="left" label-width="0px" class="demo-ruleForm login-container">
-    <h3 class="title">系统登录</h3>
+    <h3 class="title">AirmeeMall后台系统登录</h3>
     <el-form-item prop="account">
       <el-input type="text" v-model="ruleForm2.account" auto-complete="off" placeholder="账号"></el-input>
     </el-form-item>
@@ -51,20 +51,36 @@
             this.logining = true;
             //NProgress.start();
             var loginParams = { username: this.ruleForm2.account, password: this.ruleForm2.checkPass };
-            requestLogin(loginParams).then(data => {
-              this.logining = false;
-              //NProgress.done();
-              let { msg, code, user } = data;
-              if (code !== 200) {
-                this.$message({
-                  message: msg,
-                  type: 'error'
-                });
-              } else {
-                sessionStorage.setItem('user', JSON.stringify(user));
-                this.$router.push({ path: '/table' });
-              }
-            });
+            this.$http.post("/plat/login",loginParams)
+                .then(rest =>{
+                        console.debug(rest);
+                        this.logining=false;
+                        let { success, message, retObj } = rest.data;
+                    if (!success) {
+                        this.$message({
+                            message: message,
+                            type: 'error'
+                        });
+                    } else {
+                        sessionStorage.setItem('user', JSON.stringify(retObj));
+                        this.$router.push({ path: '/echarts' });
+                    }
+                }
+              /*requestLogin(loginParams).then(data => {
+                  this.logining = false;
+                  //NProgress.done();
+                  let { msg, code, user } = data;
+                  if (code !== 200) {
+                      this.$message({
+                          message: msg,
+                          type: 'error'
+                      });
+                  } else {
+                      sessionStorage.setItem('user', JSON.stringify(user));
+                      this.$router.push({ path: '/table' });
+                  }
+              } )*/
+           );
           } else {
             console.log('error submit!!');
             return false;
